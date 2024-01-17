@@ -52,12 +52,12 @@ var ipAddressToAllow = []
 // Networking
 
 resource nsgPublic 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
-  name: namePublic
+  name: 'databricksPublicNSG'
   location: location
 }
 
 resource nsgPrivate 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
-  name: namePrivate
+  name: 'databricksPrivateNSG
   location: location
 }
 
