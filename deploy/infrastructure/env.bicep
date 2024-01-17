@@ -24,6 +24,8 @@ var secretKeyStorageConnectionString = 'STORAGEACCOUNTCONNECTIONSTRING'
 
 var subnetAppServiceName = 'AppService'
 var subnetPrivateEndpointsName = 'PrivateEndpoints'
+var subnetDatabricksPublicName = 'DatabricksPublic'
+var subnetDatabricksPrivateName = 'DatabricksPrivate'
 var privateDnsZone = 'privatelink.blob.core.windows.net'
 
 var blobDataContributorRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
@@ -78,7 +80,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
         }
       }
     {
-    name: network.subnets.databricksPublic.name
+    name: subnetDatabricksPublicName
     properties: {
       addressPrefix: '10.0.3.0/24'
       delegations: [
@@ -92,7 +94,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
     }
   }
   {
-      name: network.subnets.databricksPrivate.name
+      name: subnetDatabricksPrivateName
       properties: {
         addressPrefix: '10.0.4.0/24'
         delegations: [
