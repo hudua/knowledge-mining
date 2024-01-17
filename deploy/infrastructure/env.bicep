@@ -310,6 +310,25 @@ resource azure_cosmos_db_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
   }
 }
 
+resource cosmosPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+  name: 'privatelink.documents.azure.com'
+  location: 'global'
+}
+
+resource azure_cosmos_db_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
+  name: '${dbaccount.name}/default'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'privatelink_cosmos'
+        properties: {
+          privateDnsZoneId: cosmosPrivateZone.id
+        }
+      }
+    ]
+  }
+}
+
 // Cognitive Services
 resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-18' = {
   name: cognitiveAccountName
