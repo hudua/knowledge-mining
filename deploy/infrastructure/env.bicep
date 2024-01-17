@@ -50,6 +50,15 @@ var blobDataReaderRoleDefinitionId = resourceId('Microsoft.Authorization/roleDef
 var ipAddressToAllow = []
 
 // Networking
+
+resource nsgPublic 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
+  name: namePublic
+  location: location
+
+resource nsgPrivate 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
+  name: namePrivate
+  location: location
+
 resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
   location: location
   name: 'vnet'
@@ -85,6 +94,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
     name: subnetDatabricksPublicName
     properties: {
       addressPrefix: '10.0.3.0/24'
+      networkSecurityGroup: {
+        id: nsgPublic.Id
+      }
       delegations: [
         {
           name: 'databricks-delegation-public'
@@ -99,6 +111,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
       name: subnetDatabricksPrivateName
       properties: {
         addressPrefix: '10.0.4.0/24'
+      networkSecurityGroup: {
+        id: nsgPrivate.Id
+      }
         delegations: [
           {
             name: 'databricks-delegation-private'
@@ -246,7 +261,6 @@ resource azure_search_service 'Microsoft.Search/searchServices@2020-08-01' = {
 }
 
 // Databricks
-
 resource databricks 'Microsoft.Databricks/workspaces@2018-04-01' = {
   name: databricksName
   location: location
