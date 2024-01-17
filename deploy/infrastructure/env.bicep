@@ -330,7 +330,7 @@ resource azure_openai_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZ
 resource dbaccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: cosmosName
   location: location
-kind: 'GLobalDocumentDB'
+kind: 'GlobalDocumentDB'
   properties: {
     locations: [
       {
