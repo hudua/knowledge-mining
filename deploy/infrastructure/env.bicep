@@ -15,6 +15,8 @@ var webAppName = 'site-${uniqueness}'
 var functionAppName = 'function-app-${uniqueness}'
 var appInsightsName = 'app-insights-${uniqueness}'
 var appInsightsWorkspaceName = 'workspace-${uniqueness}'
+var databricksName ='db-${uniqueness}'
+var cosmosName = 'cosmos-${uniqueness}'
 
 var secretKeySearch = 'SEARCHSERVICESECRET'
 var secretKeySignalR = 'SIGNALRCONNECTIONSTRING'
@@ -270,6 +272,20 @@ resource databricks 'Microsoft.Databricks/workspaces@2018-04-01' = {
   }
 }
 
+// Cosmos DB
+
+resource dbaccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
+  name: cosmosName
+  location: location
+  properties: {
+    locations: [
+      {
+        locationName: location
+      }
+    ]
+    databaseAccountOfferType: 'Standard'
+  }
+}
 
 // Cognitive Services
 resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-18' = {
