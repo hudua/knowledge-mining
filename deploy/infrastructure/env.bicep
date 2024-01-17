@@ -277,6 +277,7 @@ resource databricks 'Microsoft.Databricks/workspaces@2018-04-01' = {
 resource dbaccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: cosmosName
   location: location
+kind: 'GLobalDocumentDB'
   properties: {
     locations: [
       {
