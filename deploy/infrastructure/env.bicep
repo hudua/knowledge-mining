@@ -254,7 +254,7 @@ resource databricks 'Microsoft.Databricks/workspaces@2018-04-01' = {
     name: 'premium'
   }
   properties: {
-managedResourceGroupId: 'db-rg-${uniqueness}'
+managedResourceGroupId: '${subscription().id}/resourceGroups/db-rg-${uniqueness}'
     parameters: {
       customVirtualNetworkId: {
         value: vnet.id
