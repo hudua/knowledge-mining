@@ -77,6 +77,35 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
           privateEndpointNetworkPolicies: 'Disabled'
         }
       }
+    {
+    name: network.subnets.databricksPublic.name
+    properties: {
+      addressPrefix: '10.0.3.0/24'
+      delegations: [
+        {
+          name: 'databricks-delegation-public'
+          properties: {
+            serviceName: 'Microsoft.Databricks/workspaces'
+          }
+        }
+      ]
+    }
+  }
+  {
+      name: network.subnets.databricksPrivate.name
+      properties: {
+        addressPrefix: '10.0.4.0/24'
+        delegations: [
+          {
+            name: 'databricks-delegation-private'
+            properties: {
+              serviceName: 'Microsoft.Databricks/workspaces'
+            }
+          }
+        ]
+      }
+    }
+
     ]
   }
 }
