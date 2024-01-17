@@ -57,7 +57,7 @@ resource nsgPublic 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
 }
 
 resource nsgPrivate 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
-  name: 'databricksPrivateNSG
+  name: 'databricksPrivateNSG'
   location: location
 }
 
