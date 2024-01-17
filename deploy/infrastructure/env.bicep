@@ -276,6 +276,7 @@ managedResourceGroupId: '${subscription().id}/resourceGroups/db-rg-${uniqueness}
 
 resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: 'openai'
+  location: location
   kind: 'OpenAI'
   properties: {
     publicNetworkAccess: 'Disabled'
