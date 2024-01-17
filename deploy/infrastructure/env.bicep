@@ -243,6 +243,34 @@ resource azure_search_service 'Microsoft.Search/searchServices@2020-08-01' = {
   }
 }
 
+// Databricks
+
+resource databricks 'Microsoft.Databricks/workspaces@2018-04-01' = {
+  name: databricksName
+  location: location
+  sku: {
+    name: 'premium'
+  }
+  properties: {
+    managedResourceGroupId: managedResourceGroupId
+    parameters: {
+      customVirtualNetworkId: {
+        value: vnet.Id
+      } 
+      customPrivateSubnetName: {
+        value: subnetDatabricksPrivateName
+      }
+      customPublicSubnetName: {
+        value: subnetDatabricksPublicName
+      }
+      enableNoPublicIp: {
+        value: true
+      }
+    }
+  }
+}
+
+
 // Cognitive Services
 resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-18' = {
   name: cognitiveAccountName
