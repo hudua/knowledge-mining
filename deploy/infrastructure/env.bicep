@@ -279,7 +279,9 @@ resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   properties: {
     publicNetworkAccess: 'Disabled'
   }
-  sku: 'S0'
+  sku: {
+  name: 'S0'
+}
 }
 
 resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
