@@ -283,8 +283,30 @@ kind: 'GLobalDocumentDB'
       {
         locationName: location
       }
+     ]
+     databaseAccountOfferType: 'Standard'
+     publicNetworkAccess: 'Disabled'
+  }
+}
+
+resource azure_cosmos_db_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
+  name: '${dbaccount.name}-endpoint'
+  location: location
+  properties: {
+    subnet: {
+      id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'MyConnection'
+        properties: {
+          privateLinkServiceId: dbaccount.id
+          groupIds: [
+            'Sql'
+          ]
+        }
+      }
     ]
-    databaseAccountOfferType: 'Standard'
   }
 }
 
