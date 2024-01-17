@@ -97,7 +97,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
     properties: {
       addressPrefix: '10.0.3.0/24'
       networkSecurityGroup: {
-        id: nsgPublic.Id
+        id: nsgPublic.id
       }
       delegations: [
         {
@@ -114,7 +114,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
       properties: {
         addressPrefix: '10.0.4.0/24'
       networkSecurityGroup: {
-        id: nsgPrivate.Id
+        id: nsgPrivate.id
       }
         delegations: [
           {
