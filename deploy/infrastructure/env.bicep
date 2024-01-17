@@ -54,10 +54,12 @@ var ipAddressToAllow = []
 resource nsgPublic 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
   name: namePublic
   location: location
+}
 
 resource nsgPrivate 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
   name: namePrivate
   location: location
+}
 
 resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
   location: location
