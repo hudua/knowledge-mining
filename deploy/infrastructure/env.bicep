@@ -272,6 +272,57 @@ resource databricks 'Microsoft.Databricks/workspaces@2018-04-01' = {
   }
 }
 
+// Azure OpenAI
+
+resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
+  name: 'openai'
+  kind: 'OpenAI'
+  properties: {
+    publicNetworkAccess: 'Disabled'
+  }
+  sku: sku
+}
+
+resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
+  name: '${openAI.name}-endpoint'
+  location: location
+  properties: {
+    subnet: {
+      id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'MyConnection'
+        properties: {
+          privateLinkServiceId: openAI.id
+          groupIds: [
+            'account'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource openaiPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+  name: 'privatelink.openai.azure.com'
+  location: 'global'
+}
+
+resource azure_openai_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
+  name: '${openAI.name}/default'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'privatelink_openai'
+        properties: {
+          privateDnsZoneId: openaiPrivateZone.id
+        }
+      }
+    ]
+  }
+}
+
 // Cosmos DB
 
 resource dbaccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
