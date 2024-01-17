@@ -506,7 +506,7 @@ resource openaiPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
 }
 
 resource azure_openai_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
-  name: '${openAI.name}/default'
+  name: '${azure_openai_pe.name}/default'
   properties: {
     privateDnsZoneConfigs: [
       {
@@ -563,7 +563,7 @@ resource cosmosPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
 }
 
 resource azure_cosmos_db_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
-  name: '${dbaccount.name}/default'
+  name: '${azure_cosmos_db_pe.name}/default'
   properties: {
     privateDnsZoneConfigs: [
       {
