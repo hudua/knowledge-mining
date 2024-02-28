@@ -470,6 +470,7 @@ managedResourceGroupId: '${subscription().id}/resourceGroups/db-rg-${uniqueness}
 
 // Azure OpenAI
 
+/*
 resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: 'openai'
   location: location
@@ -503,6 +504,8 @@ resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
     ]
   }
 }
+
+*/
 
 /*
 #resource openaiPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
