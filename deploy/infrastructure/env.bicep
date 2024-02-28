@@ -307,21 +307,21 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
   }
 }
 
-resource storageBlobPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
-  name: privateDnsZone
-  location: 'global'
-}
+#resource storageBlobPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+#  name: privateDnsZone
+#  location: 'global'
+#}
 
-resource storageBlobPrivateZoneVirtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
-  name: '${storageBlobPrivateZone.name}/${uniqueString(vnet.id)}'
-  location: 'global'
-  properties: {
-    virtualNetwork: {
-      id: vnet.id
-    }
-    registrationEnabled: false
-  }
-}
+#resource storageBlobPrivateZoneVirtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
+#  name: '${storageBlobPrivateZone.name}/${uniqueString(vnet.id)}'
+#  location: 'global'
+#  properties: {
+#    virtualNetwork: {
+#      id: vnet.id
+#    }
+#    registrationEnabled: false
+#  }
+#}
 
 // Key Vault
 resource azure_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
