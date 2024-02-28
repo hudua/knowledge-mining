@@ -307,6 +307,8 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
   }
 }
 
+/*
+
 #resource storageBlobPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
 #  name: privateDnsZone
 #  location: 'global'
@@ -322,6 +324,8 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
 #    registrationEnabled: false
 #  }
 #}
+
+*/
 
 // Key Vault
 resource azure_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
@@ -500,6 +504,7 @@ resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
   }
 }
 
+/*
 #resource openaiPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
 #  name: 'privatelink.openai.azure.com'
 #  location: 'global'
@@ -519,6 +524,7 @@ resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
 #  }
 #}
 
+*/
 // Cosmos DB
 
 resource dbaccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
@@ -556,7 +562,7 @@ resource azure_cosmos_db_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
     ]
   }
 }
-
+/*
 #resource cosmosPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
 #  name: 'privatelink.documents.azure.com'
 #  location: 'global'
@@ -575,6 +581,8 @@ resource azure_cosmos_db_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
 #    ]
 #  }
 #}
+
+*/
 
 // Cognitive Services
 resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-18' = {
@@ -673,7 +681,7 @@ resource azure_storage_account_data_blob_pe 'Microsoft.Network/privateEndpoints@
     ]
   }
 }
-
+/*
 #resource azure_storage_account_data_blob_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
 #  name: '${azure_storage_account_data_blob_pe.name}/default'
 #  properties: {
@@ -687,6 +695,7 @@ resource azure_storage_account_data_blob_pe 'Microsoft.Network/privateEndpoints@
 #    ]
 #  }
 #}
+*/
 
 resource azure_storage_account_functions 'Microsoft.Storage/storageAccounts@2019-06-01' = if (deployFunction) {
   name: 'stgfunc${uniqueness}'
@@ -727,6 +736,7 @@ resource azure_storage_account_functions_blob_pe 'Microsoft.Network/privateEndpo
   }
 }
 
+/*
 #resource azure_storage_account_functions_blob_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = if (deployFunction) {
 #  name: '${azure_storage_account_functions_blob_pe.name}/default'
 #  properties: {
@@ -740,6 +750,7 @@ resource azure_storage_account_functions_blob_pe 'Microsoft.Network/privateEndpo
 #    ]
 #  }
 #}
+*/
 
 // App Service
 resource azure_app_service_plan 'Microsoft.Web/serverfarms@2020-06-01' = {
