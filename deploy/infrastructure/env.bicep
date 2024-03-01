@@ -1024,7 +1024,7 @@ resource app_services_function_app 'Microsoft.Web/sites@2020-06-01' = if (deploy
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '0'
+          value: '1'
         }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
