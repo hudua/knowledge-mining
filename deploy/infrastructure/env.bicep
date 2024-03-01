@@ -1047,14 +1047,14 @@ resource app_services_function_app 'Microsoft.Web/sites@2020-06-01' = if (deploy
     httpsOnly: true
   }
 }
-
+/*
 resource akv_secret_function_app_secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
   name: '${azure_key_vault.name}/FUNCTIONADMINKEY'
   properties: {
     value: listKeys('${app_services_function_app.id}/host/default', '2021-02-01').functionKeys.default
   }
 }
-
+*/
 resource function_access_policy 'Microsoft.KeyVault/vaults/accessPolicies@2021-11-01-preview' = if (deployFunction) {
   name: 'add'
   parent: azure_key_vault
