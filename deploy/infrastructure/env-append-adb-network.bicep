@@ -201,7 +201,7 @@ resource publicSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = {
   name: subnetDatabricksPublicName
   parent: VNET
   properties: {
-    addressPrefix: databricksPrivateIPRange
+    addressPrefix: databricksPublicIPRange
           networkSecurityGroup: {
         id: nsgPublic.id
       }
