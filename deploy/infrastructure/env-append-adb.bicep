@@ -1,7 +1,7 @@
 param location string = resourceGroup().location
 
 param vnetID string
-parma databricksName string
+param databricksName string
 
 var subnetDatabricksPublicName = 'AzureDatabricksPublic'
 var subnetDatabricksPrivateName = 'AzureDatabricksPrivate'
