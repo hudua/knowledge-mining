@@ -7,7 +7,7 @@ var subnetDatabricksPublicName = 'AzureDatabricksPublic'
 var subnetDatabricksPrivateName = 'AzureDatabricksPrivate'
 
 resource nsgPublic 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
-  name: 'databricksPublicNSG'
+  name: 'azureDatabricksPublicNSG'
   location: location
   properties: {
     securityRules: [
@@ -100,7 +100,7 @@ resource nsgPublic 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
 }
 
 resource nsgPrivate 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
-  name: 'databricksPrivateNSG'
+  name: 'azureDatabricksPrivateNSG'
   location: location
 properties: {
     securityRules: [
