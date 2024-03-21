@@ -16,6 +16,7 @@ var cosmosName = 'cosmos-${uniqueness}'
 
 resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing  = {
   name: vnetName
+  scope: resourceGroup('networking-rsg')
 }
 
 // Key Vault
