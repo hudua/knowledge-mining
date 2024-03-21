@@ -75,9 +75,23 @@ resource azure_search_service_pe 'Microsoft.Network/privateEndpoints@2021-08-01'
 
 // Azure OpenAI
 
+resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
+  name: 'openai'
+  location: location
+  kind: 'OpenAI'
+  properties: {
+    publicNetworkAccess: 'Disabled'
+    customSubDomainName: 'aoai-${uniqueness}'
+  }
+  sku: {
+  name: 'S0'
+}
+}
+/*
 resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' existing = {
   name: 'openai'
 }
+*/
 
 resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
   name: '${openAI.name}-endpoint'
