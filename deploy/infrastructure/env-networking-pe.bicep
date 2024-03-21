@@ -8,13 +8,10 @@ var uniqueness = uniqueString(resourceGroup().id)
 var keyVaultName = 'akv-${uniqueness}'
 var searchName = 'search-${uniqueness}'
 var cognitiveAccountName = 'cognitive-account-${uniqueness}'
-var signalRAccountName = 'signalr-${uniqueness}'
 var storageAccountNameData = 'stg${uniqueness}'
 var appServicePlanName = 'app-plan-${uniqueness}'
 var webAppName = 'site-${uniqueness}'
 var functionAppName = 'function-app-${uniqueness}'
-var appInsightsName = 'app-insights-${uniqueness}'
-var appInsightsWorkspaceName = 'workspace-${uniqueness}'
 var cosmosName = 'cosmos-${uniqueness}'
 
 
