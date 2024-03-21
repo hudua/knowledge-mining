@@ -41,7 +41,7 @@ resource azure_key_vault_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
         properties: {
           privateLinkServiceId: azure_key_vault.id
           groupIds: [
-            'valut'
+            'vault'
           ]
         }
       }
