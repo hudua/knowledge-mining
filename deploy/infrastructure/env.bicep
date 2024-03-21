@@ -50,7 +50,7 @@ var blobDataReaderRoleDefinitionId = resourceId('Microsoft.Authorization/roleDef
 var ipAddressToAllow = []
 
 // Networking
-/ *
+/*
 resource nsgPublic 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
   name: 'databricksPublicNSG'
   location: location
