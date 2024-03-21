@@ -14,8 +14,6 @@ var webAppName = 'site-${uniqueness}'
 var functionAppName = 'function-app-${uniqueness}'
 var cosmosName = 'cosmos-${uniqueness}'
 
-
-
 resource VNET 'Microsoft.Network/virtualNetworks@2021-02-01' existing  = {
   name: vnet
 }
