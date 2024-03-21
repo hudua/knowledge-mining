@@ -153,7 +153,7 @@ resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-
   }
   properties: {
     publicNetworkAccess: 'Disabled'
-    customSubDomainName: 'aoai-${uniqueness}'
+    customSubDomainName: 'aca-${uniqueness}'
   }
 }
 
