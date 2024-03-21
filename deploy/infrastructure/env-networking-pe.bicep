@@ -1,5 +1,5 @@
 
-param vnet string
+param vnetName string
 param subnetPrivateEndpointsName string
 param subnetAppServiceName string
 param location string = resourceGroup().location
@@ -14,8 +14,8 @@ var webAppName = 'site-${uniqueness}'
 var functionAppName = 'function-app-${uniqueness}'
 var cosmosName = 'cosmos-${uniqueness}'
 
-resource VNET 'Microsoft.Network/virtualNetworks@2021-02-01' existing  = {
-  name: vnet
+resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing  = {
+  name: vnetName
 }
 
 // Key Vault
