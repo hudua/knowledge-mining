@@ -45,6 +45,7 @@ resource azure_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = existing {
   name: keyVaultName
 }
 
+resource azure_key_vault_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
   name: '${azure_key_vault.name}-endpoint'
   location: location
   properties: {
@@ -68,56 +69,36 @@ resource azure_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = existing {
 
 
 // Search
-resource azure_search_service 'Microsoft.Search/searchServices@2020-08-01' = {
+resource azure_search_service 'Microsoft.Search/searchServices@2020-08-01' = existing {
   name: searchName
+}
+
+resource azure_search_service_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
+  name: '${azure_search_service.name}-endpoint'
   location: location
-  sku: {
-    name: 'standard'
-  }
-  identity: {
-    type: 'SystemAssigned'
+  properties: {
+    subnet: {
+      id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'MyConnection'
+        properties: {
+          privateLinkServiceId: azure_search_service.id
+          groupIds: [
+            'searchService'
+          ]
+        }
+      }
+    ]
   }
 }
 
-// Databricks
-resource databricks 'Microsoft.Databricks/workspaces@2018-04-01' = {
-  name: databricksName
-  location: location
-  sku: {
-    name: 'premium'
-  }
-  properties: {
-managedResourceGroupId: '${subscription().id}/resourceGroups/db-rg-${uniqueness}'
-    parameters: {
-      customVirtualNetworkId: {
-        value: vnet.id
-      } 
-      customPrivateSubnetName: {
-        value: subnetDatabricksPrivateName
-      }
-      customPublicSubnetName: {
-        value: subnetDatabricksPublicName
-      }
-      enableNoPublicIp: {
-        value: true
-      }
-    }
-  }
-}
 
 // Azure OpenAI
 
-resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
+resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' = existing {
   name: 'openai'
-  location: location
-  kind: 'OpenAI'
-  properties: {
-    publicNetworkAccess: 'Disabled'
-    customSubDomainName: 'aoai-${uniqueness}'
-  }
-  sku: {
-  name: 'S0'
-}
 }
 
 resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
@@ -142,42 +123,10 @@ resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
 }
 
 
-/*
-#resource openaiPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
-#  name: 'privatelink.openai.azure.com'
-#  location: 'global'
-#}
-
-#resource azure_openai_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
-#  name: '${azure_openai_pe.name}/default'
-#  properties: {
-#    privateDnsZoneConfigs: [
-#      {
-#        name: 'privatelink_openai'
-#        properties: {
-#          privateDnsZoneId: openaiPrivateZone.id
-#        }
-#      }
-#    ]
-#  }
-#}
-
-*/
 // Cosmos DB
 
-resource dbaccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
+resource dbaccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = existing {
   name: cosmosName
-  location: location
-kind: 'GlobalDocumentDB'
-  properties: {
-    locations: [
-      {
-        locationName: location
-      }
-     ]
-     databaseAccountOfferType: 'Standard'
-     publicNetworkAccess: 'Disabled'
-  }
 }
 
 resource azure_cosmos_db_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
@@ -200,54 +149,30 @@ resource azure_cosmos_db_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
     ]
   }
 }
-/*
-#resource cosmosPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
-#  name: 'privatelink.documents.azure.com'
-#  location: 'global'
-#}
-
-#resource azure_cosmos_db_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
-#  name: '${azure_cosmos_db_pe.name}/default'
-##  properties: {
-#    privateDnsZoneConfigs: [
-#      {
-#        name: 'privatelink_cosmos'
-#        properties: {
-#          privateDnsZoneId: cosmosPrivateZone.id
-#        }
-#      }
-#    ]
-#  }
-#}
-
-*/
 
 // Cognitive Services
-resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-18' = {
+resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-18' = existing {
   name: cognitiveAccountName
-  location: location
-  kind: 'CognitiveServices'
-  sku: {
-    name: 'S0'
-  }
 }
 
-resource azure_signal_r 'Microsoft.SignalRService/signalR@2022-02-01' = {
-  name: signalRAccountName
+resource azure_congnitive_account_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
+  name: '${azure_congnitive_account.name}-endpoint'
   location: location
-  sku:{
-    name: 'Standard_S1'
-    tier: 'Standard'
-    capacity: 1
-  }
-  properties:{
-    cors: {
-      allowedOrigins: [
-        '*'
-      ]
+  properties: {
+    subnet: {
+      id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
     }
-    features: []
-    publicNetworkAccess: 'Enabled'
+    privateLinkServiceConnections: [
+      {
+        name: 'MyConnection'
+        properties: {
+          privateLinkServiceId: azure_congnitive_account.id
+          groupIds: [
+            'account'
+          ]
+        }
+      }
+    ]
   }
 }
 
