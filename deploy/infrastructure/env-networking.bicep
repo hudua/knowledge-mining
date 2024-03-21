@@ -2,7 +2,7 @@ param location string = resourceGroup().location
 param vnet string
 param appServiceIPRange string
 
-var subnetAppServiceName = 'appService'
+var subnetAppServiceName = 'appServiceSubnet'
 
 resource VNET 'Microsoft.Network/virtualNetworks@2021-02-01' existing  = {
   name: vnet
