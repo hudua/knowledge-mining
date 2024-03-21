@@ -177,51 +177,8 @@ resource azure_congnitive_account_pe 'Microsoft.Network/privateEndpoints@2021-08
 }
 
 // Storage Accounts
-resource azure_storage_account_data 'Microsoft.Storage/storageAccounts@2019-06-01' = {
+resource azure_storage_account_data 'Microsoft.Storage/storageAccounts@2019-06-01' = existing {
   name: storageAccountNameData
-  location: location
-  kind: 'StorageV2'
-  sku: {
-    name: 'Standard_LRS'
-  }
-  properties: {
-    allowBlobPublicAccess: false
-    minimumTlsVersion: 'TLS1_2'
-    supportsHttpsTrafficOnly: true
-    networkAcls: {
-      defaultAction: 'Deny'
-      bypass: 'AzureServices, Logging, Metrics'
-      ipRules: ipAddressToAllow
-    }
-  }
-}
-
-resource azure_storage_account_blob_retention 'Microsoft.Storage/storageAccounts/blobServices@2021-09-01' = {
-  name: '${azure_storage_account_data.name}/default'
-  properties: {
-    cors:{
-      corsRules: []
-    }
-    deleteRetentionPolicy:{
-      allowPermanentDelete: false
-      enabled: true
-      days: 7
-    }
-  }
-}
-
-resource azure_storage_account_container_docs 'Microsoft.Storage/storageAccounts/blobServices/containers@2019-06-01' = {
-  name: '${azure_storage_account_data.name}/default/${docsContainerName}'
-  properties: {
-    publicAccess: 'None'
-  }
-}
-
-resource azure_storage_account_container_syn 'Microsoft.Storage/storageAccounts/blobServices/containers@2019-06-01' = {
-  name: '${azure_storage_account_data.name}/default/${synonymsContainerName}'
-  properties: {
-    publicAccess: 'None'
-  }
 }
 
 resource azure_storage_account_data_blob_pe 'Microsoft.Network/privateEndpoints@2020-06-01' = {
@@ -244,43 +201,15 @@ resource azure_storage_account_data_blob_pe 'Microsoft.Network/privateEndpoints@
     ]
   }
 }
-/*
-#resource azure_storage_account_data_blob_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
-#  name: '${azure_storage_account_data_blob_pe.name}/default'
-#  properties: {
-#    privateDnsZoneConfigs: [
-#      {
-#        name: 'privatelink_blob_core_windows_net'
-#        properties: {
-#          privateDnsZoneId: storageBlobPrivateZone.id
-#        }
-#      }
-#    ]
-#  }
-#}
-*/
 
-resource azure_storage_account_functions 'Microsoft.Storage/storageAccounts@2019-06-01' = if (deployFunction) {
+
+resource azure_storage_account_functions 'Microsoft.Storage/storageAccounts@2019-06-01' = existing {
   name: 'stgfunc${uniqueness}'
-  location: location
-  kind: 'StorageV2'
-  sku: {
-    name: 'Standard_LRS'
-  }
-  properties: {
-    allowBlobPublicAccess: false
-    minimumTlsVersion: 'TLS1_2'
-    supportsHttpsTrafficOnly: true
-    networkAcls: {
-      defaultAction: 'Deny'
-      bypass: 'Logging, Metrics'
-    }
-  }
 }
 
-resource azure_storage_account_functions_blob_pe 'Microsoft.Network/privateEndpoints@2020-06-01' = if (deployFunction) {
+resource azure_storage_account_functions_blob_pe 'Microsoft.Network/privateEndpoints@2020-06-01' = {
   location: location
-  name: '${azure_storage_account_functions.name}-blob-endpoint'
+  name: '${azure_storage_account_functions.name}-endpoint'
   properties: {
     subnet: {
       id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
@@ -299,210 +228,10 @@ resource azure_storage_account_functions_blob_pe 'Microsoft.Network/privateEndpo
   }
 }
 
-/*
-#resource azure_storage_account_functions_blob_pe_dns_reg 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = if (deployFunction) {
-#  name: '${azure_storage_account_functions_blob_pe.name}/default'
-#  properties: {
-#    privateDnsZoneConfigs: [
-#      {
-#        name: 'privatelink_blob_core_windows_net'
-#        properties: {
-#          privateDnsZoneId: storageBlobPrivateZone.id
-#        }
-#      }
-#    ]
-#  }
-#}
-*/
 
-// App Service
-resource azure_app_service_plan 'Microsoft.Web/serverfarms@2020-06-01' = {
-  name: appServicePlanName
-  location: location
-  kind: 'Linux'
-  sku: {
-    tier: 'PremiumV3'
-    name: 'P1v3'
-    family: 'Pv3'
-    capacity: 1
-    size: 'P1v3'
-  }
-  properties: {
-    reserved: true
-  }
-}
 
-resource app_insights_workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
-  name: appInsightsWorkspaceName
-  location: location
-  properties:{
-    sku: {
-      name: 'PerGB2018'
-    }
-    retentionInDays: 30
-  }
-}
-
-resource app_insights 'Microsoft.Insights/components@2020-02-02' = {
-  name: appInsightsName
-  location: location
-  kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    WorkspaceResourceId: app_insights_workspace.id
-  }
-}
-
-resource app_services_website 'Microsoft.Web/sites@2020-06-01' = {
+resource app_services_website 'Microsoft.Web/sites@2020-06-01' = existing {
   name: webAppName
-  location: location
-  kind: 'app,linux'
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    serverFarmId: azure_app_service_plan.id
-    siteConfig: {
-      linuxFxVersion: 'DOTNETCORE|6.0'
-      alwaysOn: true
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_PROFILERFEATURE_VERSION'
-          value: '1.0.0'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_Mode'
-          value: 'recommended'
-        }
-        {
-          name: 'APPINSIGHTS_SNAPSHOTFEATURE_VERSION'
-          value: '1.0.0'
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: app_insights.properties.InstrumentationKey
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: app_insights.properties.ConnectionString
-        }
-        {
-          name: 'ASPNETCORE_HOSTINGSTARTUPASSEMBLIES'
-          value: 'Microsoft.Azure.SignalR'
-        }
-        {
-          name: 'DiagnosticServices_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'InstrumentationEngine_EXTENSION_VERSION'
-          value: 'enabled'
-        }
-        {
-          name: 'SnapshotDebugger_EXTENSION_VERSION'
-          value: 'enabled'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_BaseExtensions'
-          value: 'enabled'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_PreemptSdk'
-          value: 'enabled'
-        }
-        {
-          name: 'WEBSITE_DNS_SERVER' // required for VNET Integration + Azure DNS Private Zones
-          value: '168.63.129.16'
-        }
-        {
-          name: 'WEBSITE_VNET_ROUTE_ALL'
-          value: '1'
-        }
-        {
-          name: 'AzureMaps__SubscriptionKey'
-          value: ''
-        }
-        {
-          name: 'Search__Endpoint'
-          value: 'https://${azure_search_service.name}.search.windows.net'
-        }
-        {
-          name: 'Search__Credential__Key'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${secretKeySearch})'
-        }
-        {
-          name: 'Search__IndexName'
-          value: 'km'
-        }
-        {
-          name: 'Search__IndexerName'
-          value: 'km-indexer'
-        }
-        {
-          name: 'Search__KeyField'
-          value: 'metadata_storage_path'
-        }
-        {
-          name: 'Search__SuggesterName'
-          value: 'sg'
-        }
-        {
-          name: 'Search__PageSize'
-          value: '10'
-        }
-        {
-          name: 'Search__IsPathBase64Encoded'
-          value: 'true'
-        }
-        {
-          name: 'Azure__SignalR__Enabled'
-          value: 'true'
-        }
-        {
-          name: 'Azure__SignalR__ConnectionString'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${secretKeySignalR})'
-        }
-        {
-          name: 'Storage__ServiceUri'
-          value: azure_storage_account_data.properties.primaryEndpoints.blob
-        }
-        {
-          name: 'Storage__AccountKey'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${secretKeyStorageKey})'
-        }
-        {
-          name: 'Storage__ContainerName'
-          value: docsContainerName
-        }
-        {
-          name: 'EntityMap__Facets'
-          value: 'keyPhrases, locations'
-        }
-        {
-          name: 'Customizations__Enabled'
-          value: 'true'
-        }
-        {
-          name: 'Customizations__OrganizationName'
-          value: 'Microsoft'
-        }
-        {
-          name: 'Customizations__OrganizationLogo'
-          value: '~/images/logo.png'
-        }
-        {
-          name: 'Customizations__OrganizationWebSiteUrl'
-          value: 'https://www.microsoft.com'
-        }
-      ]
-    }
-    httpsOnly: true
-    clientAffinityEnabled: false
-  }
 }
 
 resource app_services_website_vnet 'Microsoft.Web/sites/networkConfig@2020-06-01' = {
@@ -513,124 +242,31 @@ resource app_services_website_vnet 'Microsoft.Web/sites/networkConfig@2020-06-01
   }
 }
 
-resource app_services_function_app 'Microsoft.Web/sites@2020-06-01' = if (deployFunction) {
-  name: functionAppName
+resource app_services_website_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
+  name: '${app_services_website.name}-endpoint'
   location: location
-  kind: 'functionapp,linux'
-  identity: {
-    type: 'SystemAssigned'
-  }
   properties: {
-    serverFarmId: azure_app_service_plan.id
-    siteConfig: {
-      alwaysOn: true
-      linuxFxVersion: 'DOTNET|6.0'
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_PROFILERFEATURE_VERSION'
-          value: '1.0.0'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_Mode'
-          value: 'recommended'
-        }
-        {
-          name: 'APPINSIGHTS_SNAPSHOTFEATURE_VERSION'
-          value: '1.0.0'
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: app_insights.properties.InstrumentationKey
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: app_insights.properties.ConnectionString
-        }        
-        {
-          name: 'DiagnosticServices_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'InstrumentationEngine_EXTENSION_VERSION'
-          value: 'enabled'
-        }
-        {
-          name: 'SnapshotDebugger_EXTENSION_VERSION'
-          value: 'enabled'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_BaseExtensions'
-          value: 'enabled'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_PreemptSdk'
-          value: 'enabled'
-        }
-        {
-          name: 'WEBSITE_DNS_SERVER' // required for VNET Integration + Azure DNS Private Zones
-          value: '168.63.129.16'
-        }
-        {
-          name: 'WEBSITE_VNET_ROUTE_ALL'
-          value: '1'
-        }        
-        {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '10.14.1'
-        }
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'dotnet'
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'AzureWebJobsStorage'
-          value: deployFunction ? 'DefaultEndpointsProtocol=https;AccountName=${azure_storage_account_functions.name};AccountKey=${listKeys(azure_storage_account_functions.id, '2019-06-01').keys[0].value};EndpointSuffix=core.windows.net' : ''
-        }
-        {
-          name: 'SynonymsStorage'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${secretKeyStorageConnectionString})'
-        }
-      ]
+    subnet: {
+      id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
     }
-    httpsOnly: true
-  }
-}
-/*
-resource akv_secret_function_app_secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${azure_key_vault.name}/FUNCTIONADMINKEY'
-  properties: {
-    value: listKeys('${app_services_function_app.id}/host/default', '2021-02-01').functionKeys.default
-  }
-}
-*/
-resource function_access_policy 'Microsoft.KeyVault/vaults/accessPolicies@2021-11-01-preview' = if (deployFunction) {
-  name: 'add'
-  parent: azure_key_vault
-  properties: {
-    accessPolicies: deployFunction ? [
+    privateLinkServiceConnections: [
       {
-        objectId: app_services_function_app.identity.principalId
-        tenantId: app_services_function_app.identity.tenantId
-        permissions: {
-          secrets: [
-            'get'
+        name: 'MyConnection'
+        properties: {
+          privateLinkServiceId: app_services_website.id
+          groupIds: [
+            'sites'
           ]
         }
       }
-    ] : []
+    ]
   }
+}
+
+
+resource app_services_function_app 'Microsoft.Web/sites@2020-06-01' = existing {
+  name: functionAppName
+
 }
 
 resource app_services_function_app_vnet 'Microsoft.Web/sites/networkConfig@2020-06-01' = if (deployFunction) {
@@ -641,28 +277,23 @@ resource app_services_function_app_vnet 'Microsoft.Web/sites/networkConfig@2020-
   }
 }
 
-// Role Assignments
-resource roleAssignSearchToStorageBlobReader 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(azure_storage_account_data.id, blobDataReaderRoleDefinitionId, 'Blob Data Reader')
-  scope: azure_storage_account_data
+resource app_services_function_app_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
+  name: '${app_services_function_app.name}-endpoint'
+  location: location
   properties: {
-    roleDefinitionId: blobDataReaderRoleDefinitionId
-    principalId: azure_search_service.identity.principalId
+    subnet: {
+      id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'MyConnection'
+        properties: {
+          privateLinkServiceId: app_services_function_app.id
+          groupIds: [
+            'sites'
+          ]
+        }
+      }
+    ]
   }
 }
-
-resource roleAssignSiteToStorageBlobContributor 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(azure_storage_account_data.id, blobDataContributorRoleDefinitionId, 'Blob Data Contributor')
-  scope: azure_storage_account_data
-  properties: {
-    roleDefinitionId: blobDataContributorRoleDefinitionId
-    principalId: app_services_website.identity.principalId
-  }
-}
-
-output storage_data_id string = azure_storage_account_data.id
-output storage_data_name string = azure_storage_account_data.name
-output search_endpoint string = 'https://${azure_search_service.name}.search.windows.net'
-output keyvault_name string = azure_key_vault.name
-output app_name string = app_services_website.name
-output skills_name string = app_services_function_app.name
