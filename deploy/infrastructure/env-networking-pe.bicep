@@ -143,9 +143,20 @@ resource azure_cosmos_db_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
 }
 
 // Cognitive Services
-resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-18' existing = {
+
+resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-18' = {
   name: cognitiveAccountName
+  location: location
+  kind: 'CognitiveServices'
+  sku: {
+    name: 'S0'
+  }
+  properties: {
+    publicNetworkAccess: 'Disabled'
+    customSubDomainName: 'aoai-${uniqueness}'
+  }
 }
+
 
 resource azure_congnitive_account_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
   name: '${azure_congnitive_account.name}-endpoint'
