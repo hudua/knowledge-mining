@@ -1,4 +1,7 @@
 param docsContainerName string = 'documents'
+param vnet string
+param subnetPrivateEndpointsName string
+
 param synonymsContainerName string = 'synonyms'
 param deployFunction bool = true
 param location string = resourceGroup().location
@@ -33,349 +36,28 @@ var privateDnsZone = 'privatelink.blob.core.windows.net'
 var blobDataContributorRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
 var blobDataReaderRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1')
 
-/*
-  Example:
-
-  var ipAddressToAllow = [
-    {
-      value: 'x.x.x.x'
-      action: 'Allow'
-    }
-    {
-      value: 'y.y.y.y/a'
-      action: 'Allow'
-    }
-  ]
-*/
-var ipAddressToAllow = []
-
-// Networking
-/*
-resource nsgPublic 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
-  name: 'databricksPublicNSG'
-  location: location
-  properties: {
-    securityRules: [
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-inbound'
-        properties: {
-            description: 'Required for worker nodes communication within a cluster.'
-            protocol: '*'
-            sourcePortRange: '*'
-            destinationPortRange: '*'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'VirtualNetwork'
-            access: 'Allow'
-            priority: 100
-            direction: 'Inbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-databricks-webapp'
-        properties: {
-            description: 'Required for workers communication with Databricks Webapp.'
-            protocol: 'Tcp'
-            sourcePortRange: '*'
-            destinationPortRange: '443'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'AzureDatabricks'
-            access: 'Allow'
-            priority: 100
-            direction: 'Outbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-sql'
-        properties: {
-            description: 'Required for workers communication with Azure SQL services.'
-            protocol: 'Tcp'
-            sourcePortRange: '*'
-            destinationPortRange: '3306'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'Sql'
-            access: 'Allow'
-            priority: 101
-            direction: 'Outbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-storage'
-        properties: {
-            description: 'Required for workers communication with Azure Storage services.'
-            protocol: 'Tcp'
-            sourcePortRange: '*'
-            destinationPortRange: '443'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'Storage'
-            access: 'Allow'
-            priority: 102
-            direction: 'Outbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-outbound'
-        properties: {
-            description: 'Required for worker nodes communication within a cluster.'
-            protocol: '*'
-            sourcePortRange: '*'
-            destinationPortRange: '*'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'VirtualNetwork'
-            access: 'Allow'
-            priority: 103
-            direction: 'Outbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-eventhub'
-        properties: {
-            description: 'Required for worker communication with Azure Eventhub services.'
-            protocol: 'Tcp'
-            sourcePortRange: '*'
-            destinationPortRange: '9093'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'EventHub'
-            access: 'Allow'
-            priority: 104
-            direction: 'Outbound'
-        }
-      }
-    ]
-  }
+resource VNET 'Microsoft.Network/virtualNetworks@2021-02-01' existing  = {
+  name: vnet
 }
-
-resource nsgPrivate 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
-  name: 'databricksPrivateNSG'
-  location: location
-properties: {
-    securityRules: [
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-inbound'
-        properties: {
-            description: 'Required for worker nodes communication within a cluster.'
-            protocol: '*'
-            sourcePortRange: '*'
-            destinationPortRange: '*'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'VirtualNetwork'
-            access: 'Allow'
-            priority: 100
-            direction: 'Inbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-databricks-webapp'
-        properties: {
-            description: 'Required for workers communication with Databricks Webapp.'
-            protocol: 'Tcp'
-            sourcePortRange: '*'
-            destinationPortRange: '443'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'AzureDatabricks'
-            access: 'Allow'
-            priority: 100
-            direction: 'Outbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-sql'
-        properties: {
-            description: 'Required for workers communication with Azure SQL services.'
-            protocol: 'Tcp'
-            sourcePortRange: '*'
-            destinationPortRange: '3306'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'Sql'
-            access: 'Allow'
-            priority: 101
-            direction: 'Outbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-storage'
-        properties: {
-            description: 'Required for workers communication with Azure Storage services.'
-            protocol: 'Tcp'
-            sourcePortRange: '*'
-            destinationPortRange: '443'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'Storage'
-            access: 'Allow'
-            priority: 102
-            direction: 'Outbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-outbound'
-        properties: {
-            description: 'Required for worker nodes communication within a cluster.'
-            protocol: '*'
-            sourcePortRange: '*'
-            destinationPortRange: '*'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'VirtualNetwork'
-            access: 'Allow'
-            priority: 103
-            direction: 'Outbound'
-        }
-      }
-      {
-        name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-eventhub'
-        properties: {
-            description: 'Required for worker communication with Azure Eventhub services.'
-            protocol: 'Tcp'
-            sourcePortRange: '*'
-            destinationPortRange: '9093'
-            sourceAddressPrefix: 'VirtualNetwork'
-            destinationAddressPrefix: 'EventHub'
-            access: 'Allow'
-            priority: 104
-            direction: 'Outbound'
-        }
-      }
-    ]
-  }
-}
-
-*/
-
-resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
-  location: location
-  name: 'vnet'
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/16'
-      ]
-    }
-    subnets: [
-      {
-        name: subnetAppServiceName
-        properties: {
-          addressPrefix: '10.0.1.0/24'
-          delegations: [
-            {
-              name: 'appservice-serverfarm'
-              properties: {
-                serviceName: 'Microsoft.Web/serverFarms'
-              }
-            }
-          ]
-        }
-      }
-      {
-        name: subnetPrivateEndpointsName
-        properties: {
-          addressPrefix: '10.0.2.0/24'
-          privateEndpointNetworkPolicies: 'Disabled'
-        }
-      }
-    {
-    name: subnetDatabricksPublicName
-    properties: {
-      addressPrefix: '10.0.3.0/24'
-      networkSecurityGroup: {
-        id: nsgPublic.id
-      }
-      delegations: [
-        {
-          name: 'databricks-delegation-public'
-          properties: {
-            serviceName: 'Microsoft.Databricks/workspaces'
-          }
-        }
-      ]
-    }
-  }
-  {
-      name: subnetDatabricksPrivateName
-      properties: {
-        addressPrefix: '10.0.4.0/24'
-      networkSecurityGroup: {
-        id: nsgPrivate.id
-      }
-        delegations: [
-          {
-            name: 'databricks-delegation-private'
-            properties: {
-              serviceName: 'Microsoft.Databricks/workspaces'
-            }
-          }
-        ]
-      }
-    }
-
-    ]
-  }
-}
-
-/*
-
-#resource storageBlobPrivateZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
-#  name: privateDnsZone
-#  location: 'global'
-#}
-
-#resource storageBlobPrivateZoneVirtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
-#  name: '${storageBlobPrivateZone.name}/${uniqueString(vnet.id)}'
-#  location: 'global'
-#  properties: {
-#    virtualNetwork: {
-#      id: vnet.id
-#    }
-#    registrationEnabled: false
-#  }
-#}
-
-*/
 
 // Key Vault
-resource azure_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
+resource azure_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = existing {
   name: keyVaultName
+}
+
+  name: '${azure_key_vault.name}-endpoint'
   location: location
   properties: {
-    sku: {
-      family: 'A'
-      name: 'premium'
+    subnet: {
+      id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
     }
-    tenantId: subscription().tenantId
-    enableSoftDelete: true
-    enablePurgeProtection: true
-    softDeleteRetentionInDays: 7
-    enableRbacAuthorization: false
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Allow'
-    }
-    accessPolicies: empty(servicePrincipalId) ? [
+    privateLinkServiceConnections: [
       {
-        objectId: app_services_website.identity.principalId
-        tenantId: app_services_website.identity.tenantId
-        permissions: {
-          secrets: [
-            'get'
-          ]
-        }
-      }
-    ] : [
-      {
-        objectId: servicePrincipalId
-        tenantId: subscription().tenantId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-            'set'
-            'delete'
-          ]
-        }
-      }
-      {
-        objectId: app_services_website.identity.principalId
-        tenantId: app_services_website.identity.tenantId
-        permissions: {
-          secrets: [
-            'get'
+        name: 'MyConnection'
+        properties: {
+          privateLinkServiceId: azure_key_vault.id
+          groupIds: [
+            'valut'
           ]
         }
       }
@@ -383,54 +65,7 @@ resource azure_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
   }
 }
 
-resource akv_secret_storage_account_resource_id 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${azure_key_vault.name}/STORAGEACCOUNTRESOURCEID'
-  properties: {
-    value: azure_storage_account_data.id
-  }
-}
 
-resource akv_secret_storage_account_secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${azure_key_vault.name}/${secretKeyStorageConnectionString}'
-  properties: {
-    value: 'DefaultEndpointsProtocol=https;AccountName=${azure_storage_account_data.name};AccountKey=${listKeys(azure_storage_account_data.id, '2019-06-01').keys[0].value};EndpointSuffix=core.windows.net'
-  }
-}
-
-resource akv_secret_storage_account_key_secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${azure_key_vault.name}/${secretKeyStorageKey}'
-  properties: {
-    value: listKeys(azure_storage_account_data.id, '2019-06-01').keys[0].value
-  }
-}
-
-resource akv_secret_search_endpoint 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${azure_key_vault.name}/SEARCHSERVICEENDPOINT'
-  properties: {
-    value: 'https://${azure_search_service.name}.search.windows.net'
-  }
-}
-
-resource akv_secret_search_secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${azure_key_vault.name}/${secretKeySearch}'
-  properties: {
-    value: listAdminKeys(azure_search_service.id, '2020-08-01').primaryKey
-  }
-}
-
-resource akv_secret_cognitive_services_secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${azure_key_vault.name}/${secretKeyCognitive}'
-  properties: {
-    value: listKeys(azure_congnitive_account.id, '2017-04-18').key1
-  }
-}
-
-resource akv_secret_signalr_secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${azure_key_vault.name}/${secretKeySignalR}'
-  properties:{
-    value: azure_signal_r.listKeys().primaryConnectionString
-  }
-}
 
 // Search
 resource azure_search_service 'Microsoft.Search/searchServices@2020-08-01' = {
