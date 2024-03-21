@@ -1,11 +1,8 @@
-param docsContainerName string = 'documents'
+
 param vnet string
 param subnetPrivateEndpointsName string
-
-param synonymsContainerName string = 'synonyms'
-param deployFunction bool = true
+param subnetAppServiceName string
 param location string = resourceGroup().location
-param servicePrincipalId string = ''
 
 var uniqueness = uniqueString(resourceGroup().id)
 var keyVaultName = 'akv-${uniqueness}'
@@ -18,23 +15,9 @@ var webAppName = 'site-${uniqueness}'
 var functionAppName = 'function-app-${uniqueness}'
 var appInsightsName = 'app-insights-${uniqueness}'
 var appInsightsWorkspaceName = 'workspace-${uniqueness}'
-var databricksName ='db-${uniqueness}'
 var cosmosName = 'cosmos-${uniqueness}'
 
-var secretKeySearch = 'SEARCHSERVICESECRET'
-var secretKeySignalR = 'SIGNALRCONNECTIONSTRING'
-var secretKeyCognitive = 'COGNITIVESERVICESSECRET'
-var secretKeyStorageKey = 'STORAGEACCOUNTKEYSECRET'
-var secretKeyStorageConnectionString = 'STORAGEACCOUNTCONNECTIONSTRING'
 
-var subnetAppServiceName = 'AppService'
-var subnetPrivateEndpointsName = 'PrivateEndpoints'
-var subnetDatabricksPublicName = 'DatabricksPublic'
-var subnetDatabricksPrivateName = 'DatabricksPrivate'
-var privateDnsZone = 'privatelink.blob.core.windows.net'
-
-var blobDataContributorRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
-var blobDataReaderRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1')
 
 resource VNET 'Microsoft.Network/virtualNetworks@2021-02-01' existing  = {
   name: vnet
