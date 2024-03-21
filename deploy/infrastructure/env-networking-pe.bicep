@@ -24,7 +24,7 @@ resource azure_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
 }
 
 resource azure_key_vault_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
-  name: '${azure_key_vault.name}-endpoint'
+  name: '${azure_key_vault.name}-endpoint-2'
   location: location
   properties: {
     subnet: {
@@ -52,7 +52,7 @@ resource azure_search_service 'Microsoft.Search/searchServices@2020-08-01' exist
 }
 
 resource azure_search_service_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
-  name: '${azure_search_service.name}-endpoint'
+  name: '${azure_search_service.name}-endpoint-2'
   location: location
   properties: {
     subnet: {
@@ -80,7 +80,7 @@ resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' existing = {
 }
 
 resource azure_openai_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
-  name: '${openAI.name}-endpoint'
+  name: '${openAI.name}-endpoint-2'
   location: location
   properties: {
     subnet: {
@@ -108,7 +108,7 @@ resource dbaccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' existing =
 }
 
 resource azure_cosmos_db_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
-  name: '${dbaccount.name}-endpoint'
+  name: '${dbaccount.name}-endpoint-2'
   location: location
   properties: {
     subnet: {
@@ -145,7 +145,7 @@ resource azure_congnitive_account 'Microsoft.CognitiveServices/accounts@2017-04-
 
 
 resource azure_congnitive_account_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
-  name: '${azure_congnitive_account.name}-endpoint'
+  name: '${azure_congnitive_account.name}-endpoint-2'
   location: location
   properties: {
     subnet: {
@@ -172,7 +172,7 @@ resource azure_storage_account_data 'Microsoft.Storage/storageAccounts@2019-06-0
 
 resource azure_storage_account_data_blob_pe 'Microsoft.Network/privateEndpoints@2020-06-01' = {
   location: location
-  name: '${azure_storage_account_data.name}-blob-endpoint'
+  name: '${azure_storage_account_data.name}-blob-endpoint-2'
   properties: {
     subnet: {
       id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
@@ -198,7 +198,7 @@ resource azure_storage_account_functions 'Microsoft.Storage/storageAccounts@2019
 
 resource azure_storage_account_functions_blob_pe 'Microsoft.Network/privateEndpoints@2020-06-01' = {
   location: location
-  name: '${azure_storage_account_functions.name}-endpoint'
+  name: '${azure_storage_account_functions.name}-endpoint-2'
   properties: {
     subnet: {
       id: '${vnet.id}/subnets/${subnetPrivateEndpointsName}'
@@ -232,7 +232,7 @@ resource app_services_website_vnet 'Microsoft.Web/sites/networkConfig@2020-06-01
 }
 
 resource app_services_website_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
-  name: '${app_services_website.name}-endpoint'
+  name: '${app_services_website.name}-endpoint-2'
   location: location
   properties: {
     subnet: {
@@ -267,7 +267,7 @@ resource app_services_function_app_vnet 'Microsoft.Web/sites/networkConfig@2020-
 }
 
 resource app_services_function_app_pe 'Microsoft.Network/privateEndpoints@2021-08-01' = {
-  name: '${app_services_function_app.name}-endpoint'
+  name: '${app_services_function_app.name}-endpoint-2'
   location: location
   properties: {
     subnet: {
